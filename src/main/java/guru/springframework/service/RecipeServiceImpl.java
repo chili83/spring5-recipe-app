@@ -1,7 +1,10 @@
 package guru.springframework.service;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
+
+import javax.persistence.EntityNotFoundException;
 
 import org.springframework.stereotype.Service;
 
@@ -21,10 +24,19 @@ public class RecipeServiceImpl implements RecipeService{
 
 	@Override
 	public Set<Recipe> getRecipes() {
-		log.debug("Recipes caled");
+		log.debug("Recipes called");
 		Set<Recipe> recipeSet = new HashSet<>();
 		recipeRepo.findAll().iterator().forEachRemaining(recipeSet::add);
 		return recipeSet;
+	}
+
+	@Override
+	public Recipe getRecipe(Long id) {
+		Optional<Recipe> recipe = recipeRepo.findById(id);
+		if (!recipe.isPresent()) {
+			throw new EntityNotFoundException("Recipe not found!");
+		}
+		return recipe.get();
 	}
 	
 }
