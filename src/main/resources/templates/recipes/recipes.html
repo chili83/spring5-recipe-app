@@ -42,7 +42,7 @@
                                 <td th:text="${recipe.cookTime}">2</td>
                                 <td th:text="${recipe.servings}">3</td>
                                 <td th:text="${recipe.source}">CookNews</td>
-                                <td th:text="${recipe.url}">http://www.geil.de</td>
+                                <td><a th:href="./${recipe.id}">Link</a></td>
                             </tr>
                             <tr th:remove="all">
                                 <td th:text="${recipe.id}">12333</td>
@@ -51,7 +51,7 @@
                                 <td th:text="${recipe.cookTime}">2</td>
                                 <td th:text="${recipe.servings}">3</td>
                                 <td th:text="${recipe.source}">CookNews</td>
-                                <td th:text="${recipe.url}">http://www.geil.de</td>
+                                <td><a th:href="./${recipe.id}">Link</a></td>
                             </tr>
                             <tr th:each="recipe : ${recipes}">
                                 <td th:text="${recipe.id}">334</td>
@@ -60,7 +60,7 @@
                                 <td th:text="${recipe.cookTime}">2</td>
                                 <td th:text="${recipe.servings}">3</td>
                                 <td th:text="${recipe.source}">CookNews</td>
-                                <td th:text="${recipe.url}">http://www.geil.de</td>
+                                <td><a th:href="@{'/recipes/'} + ${recipe.id}">View</a></td>
                             </tr>
                         </table>
                     </div>

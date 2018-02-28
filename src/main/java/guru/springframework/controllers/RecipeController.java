@@ -9,6 +9,7 @@ import guru.springframework.domain.Recipe;
 import guru.springframework.service.RecipeService;
 
 @Controller
+@RequestMapping("/recipes")
 public class RecipeController {
 
 	private RecipeService recipeService;
@@ -19,18 +20,18 @@ public class RecipeController {
 	}
 
 
-	@RequestMapping("/recipes")
+	@RequestMapping("")
 	public String getRecipesPage(Model mdl){
 		mdl.addAttribute("recipes", recipeService.getRecipes());
-		return "recipes";
+		return "recipes/recipes";
 	}
 	
-	@RequestMapping("/recipes/{id}")
-	public String getRecipePage(@PathVariable long id, Model mdl) {
+	@RequestMapping("{id}")
+	public String getRecipePage(@PathVariable String id, Model mdl) {
 		
-		Recipe recipe = recipeService.getRecipe(id);
+		Recipe recipe = recipeService.getRecipe(new Long(id));
 		mdl.addAttribute("recipe",recipe);
 		
-		return "recipe";
+		return "recipes/recipe";
 	}
 }

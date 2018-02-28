@@ -64,7 +64,7 @@ public class RecipeControllerTest {
 	
 	@Test
 	public void getRecipePage() throws Exception {
-		performGetTest("/recipes/1", "recipe");
+		performGetTest("/recipes/1", "recipes/recipe");
 		
 		//Given
 		Recipe recipe = getRecipe();
@@ -73,7 +73,7 @@ public class RecipeControllerTest {
 		//Then
 		
 		//Prüfe ob das Model das Rezept enthält
-		String viewName = recipeController.getRecipePage(recipe.getId(), model);
+		String viewName = recipeController.getRecipePage(String.valueOf(recipe.getId()), model);
 		ArgumentCaptor<Recipe> recipeCaptor = ArgumentCaptor.forClass(Recipe.class);
 		verify(model, times(1)).addAttribute(Mockito.eq("recipe"), recipeCaptor.capture());
 		assertEquals(recipe, recipeCaptor.getValue());
@@ -81,7 +81,7 @@ public class RecipeControllerTest {
 
 	@Test
 	public void getRecipesPage() throws Exception {
-		performGetTest("/recipes/", "recipes");
+		performGetTest("/recipes/", "recipes/recipes");
 		
 		//Given
 		Set<Recipe> recipesData = getRecipes();
