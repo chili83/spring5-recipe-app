@@ -22,8 +22,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
+@EqualsAndHashCode(callSuper=false)
 @Entity
-public class Recipe {
+public class Recipe extends DomainObject{
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
 	private Long Id;
@@ -47,15 +48,17 @@ public class Recipe {
 	@Lob
 	private Byte[] image;
 	
-	@OneToOne(cascade=CascadeType.ALL)
+	@OneToOne(cascade=CascadeType.ALL, orphanRemoval=true)
 	private Notes notes;
 	
-	@OneToMany(cascade=CascadeType.ALL, mappedBy="recipe")
+	@OneToMany(cascade= {CascadeType.ALL}, mappedBy="recipe", orphanRemoval=true)
 	private Set<Ingredient> ingredients = new HashSet<>();
 	
 	public void setNotes(Notes notes) {
-		this.notes = notes;
-		notes.setRecipe(this);
+        if (notes != null) {
+        	this.notes = notes;
+        	notes.setRecipe(this);
+        }
 	}
 
 	public void setIngredients(Set<Ingredient> ingredients) {

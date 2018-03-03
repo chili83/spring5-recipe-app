@@ -13,9 +13,9 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(exclude= {"recipes"})
+@EqualsAndHashCode(callSuper=false, exclude= {"recipes"})
 @Entity
-public class Category {
+public class Category extends DomainObject{
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

@@ -15,9 +15,9 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(exclude= {"recipe"})
+@EqualsAndHashCode(callSuper=false, exclude= {"recipe"})
 @Entity
-public class Ingredient {
+public class Ingredient extends DomainObject{
 
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)

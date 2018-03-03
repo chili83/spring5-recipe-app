@@ -32,7 +32,9 @@
                                 <th>Cook time</th>
                                 <th>Servings</th>
                                 <th>Source</th>
-                                <th>URL</th>
+                                <th>View</th>
+                                <th>Update</th>
+                                <th>Delete</th>
                             </tr>
                             </thead>
                             <tr th:remove="all">
@@ -42,7 +44,9 @@
                                 <td th:text="${recipe.cookTime}">2</td>
                                 <td th:text="${recipe.servings}">3</td>
                                 <td th:text="${recipe.source}">CookNews</td>
-                                <td><a th:href="./${recipe.id}">Link</a></td>
+                                <td><a th:href="./${recipe.id}">View</a></td>
+                                <td><a th:href="./${recipe.id}">Update</a></td>
+                                <td><a th:href="./${recipe.id}">Delete</a></td>
                             </tr>
                             <tr th:remove="all">
                                 <td th:text="${recipe.id}">12333</td>
@@ -51,8 +55,11 @@
                                 <td th:text="${recipe.cookTime}">2</td>
                                 <td th:text="${recipe.servings}">3</td>
                                 <td th:text="${recipe.source}">CookNews</td>
-                                <td><a th:href="./${recipe.id}">Link</a></td>
+                                <td><a th:href="./${recipe.id}">View</a></td>
+                                <td><a th:href="./${recipe.id}">Update</a></td>
+                                <td><a th:href="./${recipe.id}">Delete</a></td>
                             </tr>
+                            <!--/*@thymesVar id="recipe" type="guru.springframework.domain.Recipe"*/-->
                             <tr th:each="recipe : ${recipes}">
                                 <td th:text="${recipe.id}">334</td>
                                 <td th:text="${recipe.description}">Tasty Goodnees 3</td>
@@ -61,6 +68,8 @@
                                 <td th:text="${recipe.servings}">3</td>
                                 <td th:text="${recipe.source}">CookNews</td>
                                 <td><a th:href="@{'/recipes/'} + ${recipe.id}">View</a></td>
+                                <td><a th:href="@{'/recipes/'} + ${recipe.id +'/edit'}">Update</a></td>
+                                <td><a th:href="@{'/recipes/'} + ${recipe.id +'/delete'}">Delete</a></td>
                             </tr>
                         </table>
                     </div>
