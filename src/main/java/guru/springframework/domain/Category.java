@@ -13,7 +13,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper=false, exclude= {"recipes"})
+@EqualsAndHashCode(callSuper=true, exclude= {"recipes"})
 @Entity
 public class Category extends DomainObject{
 

@@ -3,14 +3,14 @@ package guru.springframework.domain;
 import javax.persistence.MappedSuperclass;
 
 import guru.springframework.util.UUIDGenerator;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 
-@Data
 @Getter
 @Setter
 @MappedSuperclass
+@EqualsAndHashCode(exclude= {"UUID"})
 public class DomainObject {
 
 	private String UUID;

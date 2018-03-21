@@ -11,7 +11,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 
 @Data
-@EqualsAndHashCode(callSuper=false, exclude= {"recipe"})
+@EqualsAndHashCode(callSuper=true, exclude= {"recipe"})
 @Entity
 public class Notes extends DomainObject {
 	@Id

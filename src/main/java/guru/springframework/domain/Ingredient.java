@@ -12,10 +12,12 @@ import javax.persistence.OneToOne;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(callSuper=false, exclude= {"recipe"})
+@EqualsAndHashCode(callSuper=true, exclude= {"recipe"})
+@ToString(exclude= {"recipe"})
 @Entity
 public class Ingredient extends DomainObject{
 
