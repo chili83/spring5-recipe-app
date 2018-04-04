@@ -32,6 +32,7 @@
 								Description Here!</h1>
 						</div>
 						<div class="panel-body">
+
 							<div class="btn btn-warning">
 								<a th:href="@{'/recipes/'} + ${recipe.id +'/edit'}">Update</a>
 							</div>
@@ -49,6 +50,14 @@
 										<li th:each="category : ${recipe.categories}"
 											th:text="${category.description}">cat three</li>
 									</ul>
+								</div>
+							</div>
+							<div class="row">
+								<div class="col-md-3">
+									<h5>Prep Time:</h5>
+									<img id="profileImage"
+										th:src="*{'data:image/jpg;base64,'+ recipe.getImageBase64Encoded()}"
+										src="" width="200px"/>
 								</div>
 							</div>
 							<div class="row">

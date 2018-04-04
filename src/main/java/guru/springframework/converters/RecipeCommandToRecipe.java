@@ -1,11 +1,12 @@
 package guru.springframework.converters;
 
-import guru.springframework.commands.RecipeCommand;
-import guru.springframework.domain.Recipe;
-import lombok.Synchronized;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.lang.Nullable;
 import org.springframework.stereotype.Component;
+
+import guru.springframework.commands.RecipeCommand;
+import guru.springframework.domain.Recipe;
+import lombok.Synchronized;
 
 @Component
 public class RecipeCommandToRecipe implements Converter<RecipeCommand, Recipe> {
@@ -41,6 +42,7 @@ public class RecipeCommandToRecipe implements Converter<RecipeCommand, Recipe> {
         target.setUrl(source.getUrl());
         target.setNotes(notesConverter.convert(source.getNotes()));
         target.setUUID(source.getUUID());
+        target.setImage(source.getImage());
 
         if (source.getCategories() != null && source.getCategories().size() > 0){
             source.getCategories()
@@ -51,7 +53,6 @@ public class RecipeCommandToRecipe implements Converter<RecipeCommand, Recipe> {
             source.getIngredients()
                     .forEach(ingredient -> target.getIngredients().add(ingredientConverter.convert(ingredient)));
         }
-
         return target;
     }
 }

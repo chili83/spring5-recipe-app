@@ -8,15 +8,19 @@ import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.IOException;
 import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.web.multipart.MultipartFile;
 
 import guru.springframework.commands.RecipeCommand;
 import guru.springframework.converters.RecipeCommandToRecipe;
@@ -149,6 +153,35 @@ public class RecipeServiceImplTest {
 		assertNotNull("Recipe has no ID", storedResult.getId());
 		assertEquals(storedResult.getId(), storedRecipe.getId());
 		
+	}
+	
+	@Test
+	public void addRecipeImage() throws IOException {
 		
+		 //given
+        Long id = 1L;
+        MultipartFile multipartFile = new MockMultipartFile("imagefile", "testing.txt", "text/plain",
+                "Spring Framework Guru".getBytes());
+
+        Recipe recipe = new Recipe();
+        recipe.setId(id);
+        Optional<Recipe> recipeOptional = Optional.of(recipe);
+        
+        RecipeCommand recipeCommand = new RecipeCommand();
+        recipeCommand.setId(recipe.getId());
+
+        when(recipeRepository.findById(Mockito.anyLong())).thenReturn(recipeOptional);
+        when(recipeToRecipeCommand.convert(Mockito.any())).thenReturn(recipeCommand);
+        when(recipeCommandToRecipe.convert(Mockito.any())).thenReturn(recipe);
+
+        ArgumentCaptor<Recipe> argumentCaptor = ArgumentCaptor.forClass(Recipe.class);
+
+        //when
+        RecipeCommand savedRecipeResult = recipeService.addRecipeImage(id, multipartFile);
+
+        //then
+        verify(recipeRepository, times(1)).save(argumentCaptor.capture());
+        Recipe savedRecipe = argumentCaptor.getValue();
+        assertEquals(multipartFile.getBytes().length, savedRecipe.getImage().length);
 	}
 }

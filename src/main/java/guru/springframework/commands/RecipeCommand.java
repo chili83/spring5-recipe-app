@@ -1,5 +1,6 @@
 package guru.springframework.commands;
 
+import java.util.Base64;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -55,5 +56,16 @@ public class RecipeCommand extends DomainObject{
     	this.ingredients.add(ingredient);
     }
 
+    public String getImageBase64Encoded() {
+    	if (image != null) {
+    		byte[] bytes = new byte[image.length];
+    		int i = 0;
+    		for (byte b : image) {
+    			bytes[i++] = b;
+    		}
+    		return new String(Base64.getEncoder().encodeToString(bytes));
+    	}
+    	return "";
+    }
 
 }

@@ -1,5 +1,9 @@
 package guru.springframework.controllers;
 
+import java.io.IOException;
+
+import javax.persistence.EntityNotFoundException;
+
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -8,6 +12,8 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 import guru.springframework.commands.RecipeCommand;
 import guru.springframework.service.RecipeService;
@@ -34,6 +40,9 @@ public class RecipeController {
 	public String getRecipePage(@PathVariable String id, Model mdl) {
 		
 		RecipeCommand recipe = recipeService.getRecipe(new Long(id));
+		if (recipe == null) {
+			throw new EntityNotFoundException();
+		}
 		mdl.addAttribute("recipe",recipe);
 		
 		return "recipes/recipe";
@@ -57,6 +66,28 @@ public class RecipeController {
 		return "redirect:/recipes";
 	}
 	
+	@GetMapping("/{id}/image")
+	public String editRecipeImage(@PathVariable Long id, Model mdl) {
+		
+		RecipeCommand recipe = recipeService.getRecipe(id);
+		if (recipe == null) {
+			throw new EntityNotFoundException();
+		}
+		mdl.addAttribute("recipe",recipe);
+		return "recipes/imageform";
+	}
+	
+	@PostMapping("/{id}/image")
+	public String saveRecipeImage(@PathVariable Long id, @RequestParam("imagefile") MultipartFile file) {
+		
+		try {
+			recipeService.addRecipeImage(id, file);
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return "redirect:/recipes/"+id;
+	}
+	
 	
 	@PostMapping(""/*name="", method=RequestMethod.POST*/)
 	public String saveOrUpdate(@ModelAttribute RecipeCommand command) {
@@ -64,6 +95,7 @@ public class RecipeController {
 		return "redirect:/recipes/" + result.getId();
 	}
 	
+
 	
 	
 	
