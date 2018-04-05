@@ -1,5 +1,6 @@
 package guru.springframework.service;
 
+import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -19,6 +20,8 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.stubbing.Answer;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -173,6 +176,14 @@ public class RecipeServiceImplTest {
         when(recipeRepository.findById(Mockito.anyLong())).thenReturn(recipeOptional);
         when(recipeToRecipeCommand.convert(Mockito.any())).thenReturn(recipeCommand);
         when(recipeCommandToRecipe.convert(Mockito.any())).thenReturn(recipe);
+        when(recipeRepository.save(Mockito.any(Recipe.class))).then(new Answer<Void>() {
+
+			@Override
+			public Void answer(InvocationOnMock arg0) throws Throwable {
+				recipe.setImage(recipeCommand.getImage());
+				return null;
+			}
+		});
 
         ArgumentCaptor<Recipe> argumentCaptor = ArgumentCaptor.forClass(Recipe.class);
 
@@ -180,6 +191,7 @@ public class RecipeServiceImplTest {
         RecipeCommand savedRecipeResult = recipeService.addRecipeImage(id, multipartFile);
 
         //then
+        assertNotNull(recipeCommand.getImage());
         verify(recipeRepository, times(1)).save(argumentCaptor.capture());
         Recipe savedRecipe = argumentCaptor.getValue();
         assertEquals(multipartFile.getBytes().length, savedRecipe.getImage().length);
