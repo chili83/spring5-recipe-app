@@ -16,8 +16,8 @@ import guru.springframework.commands.RecipeCommand;
 import guru.springframework.converters.RecipeCommandToRecipe;
 import guru.springframework.converters.RecipeToRecipeCommand;
 import guru.springframework.domain.Recipe;
+import guru.springframework.exceptions.NotFoundException;
 import guru.springframework.repositories.RecipeRepository;
-import javassist.bytecode.ByteArray;
 import lombok.extern.slf4j.Slf4j;
 
 @Service
@@ -54,7 +54,7 @@ public class RecipeServiceImpl implements RecipeService{
 	public RecipeCommand getRecipe(Long id) {
 		Optional<Recipe> recipe = recipeRepo.findById(id);
 		if (!recipe.isPresent()) {
-			throw new EntityNotFoundException("Recipe not found!");
+			throw new NotFoundException("Recipe not found!");
 		}
 		return recipeToRecipeCommand.convert(recipe.get());
 	}
@@ -79,8 +79,8 @@ public class RecipeServiceImpl implements RecipeService{
 	@Override
 	public RecipeCommand addRecipeImage(Long id, MultipartFile file) throws IOException {
 		
-		byte[] bytes = file.getBytes();
 		RecipeCommand recipe = getRecipe(id);
+		byte[] bytes = file.getBytes();
 		if (recipe == null) throw new EntityNotFoundException();
 		
 		Byte[] imageBytes = new Byte[bytes.length];

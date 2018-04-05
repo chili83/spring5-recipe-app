@@ -2,20 +2,23 @@ package guru.springframework.controllers;
 
 import java.io.IOException;
 
-import javax.persistence.EntityNotFoundException;
-
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.ModelAndView;
 
 import guru.springframework.commands.RecipeCommand;
+import guru.springframework.exceptions.NotFoundException;
 import guru.springframework.service.RecipeService;
 
 @Controller
@@ -40,9 +43,6 @@ public class RecipeController {
 	public String getRecipePage(@PathVariable String id, Model mdl) {
 		
 		RecipeCommand recipe = recipeService.getRecipe(new Long(id));
-		if (recipe == null) {
-			throw new EntityNotFoundException();
-		}
 		mdl.addAttribute("recipe",recipe);
 		
 		return "recipes/recipe";
@@ -70,11 +70,9 @@ public class RecipeController {
 	public String editRecipeImage(@PathVariable Long id, Model mdl) {
 		
 		RecipeCommand recipe = recipeService.getRecipe(id);
-		if (recipe == null) {
-			throw new EntityNotFoundException();
-		}
 		mdl.addAttribute("recipe",recipe);
 		return "recipes/imageform";
+		
 	}
 	
 	@PostMapping("/{id}/image")
@@ -95,7 +93,22 @@ public class RecipeController {
 		return "redirect:/recipes/" + result.getId();
 	}
 	
-
+	@ResponseStatus(HttpStatus.NOT_FOUND)
+	@ExceptionHandler(NotFoundException.class)
+	public ModelAndView handleNotFound(NotFoundException e) {
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("exception",e);
+		mv.setViewName("404error");
+		return mv;
+	}
+	@ResponseStatus(HttpStatus.BAD_REQUEST)
+	@ExceptionHandler(NumberFormatException.class)
+	public ModelAndView handleNotFound(Exception e) {
+		ModelAndView mv = new ModelAndView();
+		mv.addObject("exception",e);
+		mv.setViewName("400error");
+		return mv;
+	}
 	
 	
 	

@@ -1,6 +1,5 @@
 package guru.springframework.service;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertSame;
@@ -29,6 +28,7 @@ import guru.springframework.commands.RecipeCommand;
 import guru.springframework.converters.RecipeCommandToRecipe;
 import guru.springframework.converters.RecipeToRecipeCommand;
 import guru.springframework.domain.Recipe;
+import guru.springframework.exceptions.NotFoundException;
 import guru.springframework.repositories.RecipeRepository;
 
 public class RecipeServiceImplTest {
@@ -195,5 +195,15 @@ public class RecipeServiceImplTest {
         verify(recipeRepository, times(1)).save(argumentCaptor.capture());
         Recipe savedRecipe = argumentCaptor.getValue();
         assertEquals(multipartFile.getBytes().length, savedRecipe.getImage().length);
+	}
+	
+	@Test(expected=NotFoundException.class)
+	public void getRecipeByIDNotFoundTest() {
+		//Given
+		Optional<Recipe> recipe = Optional.empty();
+		when(recipeRepository.findById(Mockito.anyLong())).thenReturn(recipe);
+		
+		//When
+		recipeService.getRecipe(1L);
 	}
 }

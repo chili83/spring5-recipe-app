@@ -1,20 +1,19 @@
 package guru.springframework.controllers;
 
-import static org.hamcrest.CoreMatchers.notNullValue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
 import java.util.HashSet;
 import java.util.Set;
 
-import org.hamcrest.Matchers;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
@@ -24,6 +23,7 @@ import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
 
 import guru.springframework.commands.RecipeCommand;
+import guru.springframework.exceptions.NotFoundException;
 import guru.springframework.service.RecipeService;
 import lombok.extern.slf4j.Slf4j;
 
@@ -223,4 +223,29 @@ public class RecipeControllerTest {
 		verify(recipeService, times(1)).addRecipeImage(Mockito.eq(recipeID), Mockito.eq(file));
 	}
 
+		
+	@Test
+	public void getRecipeByIDNotFoundTest() throws Exception {
+		//Given
+		when(recipeService.getRecipe(Mockito.anyLong())).thenThrow(NotFoundException.class);
+		
+		//When
+		MockMvcBuilders.standaloneSetup(recipeController).build()
+			.perform(MockMvcRequestBuilders.get("/recipes/1"))
+			.andExpect(status().isNotFound())
+			.andExpect(view().name("404error"));
+		
+	}
+	@Test
+	public void getRecipeByIDBadRequestTest() throws Exception {
+		//Given
+		when(recipeService.getRecipe(Mockito.anyLong())).thenThrow(NotFoundException.class);
+		
+		//When
+		MockMvcBuilders.standaloneSetup(recipeController).build()
+		.perform(MockMvcRequestBuilders.get("/recipes/ASD"))
+		.andExpect(status().isBadRequest())
+		.andExpect(view().name("400error"));
+		
+	}
 }
