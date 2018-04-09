@@ -6,15 +6,12 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.view;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -47,10 +44,9 @@ public class RecipeControllerTest {
 	}
 	
 	
-	
-	
+	//Read
 	@Test
-	public void getRecipePage() throws Exception {
+	public void showByIdTest() throws Exception {
 		
 		RecipeCommand recipe = new RecipeCommand();
 		recipe.setId(1L);
@@ -74,59 +70,9 @@ public class RecipeControllerTest {
 		*/
 	}
 	
+	//Edit
 	@Test
-	public void getRecipesPage() throws Exception {
-		
-		//Given
-		RecipeCommand recipe = new RecipeCommand();
-		recipe.setId(1L);
-		recipe.setDescription("Tiramisu");
-		
-		Set<RecipeCommand> recipesData = new HashSet<>();
-		recipesData.add(recipe);
-		
-		when(recipeService.getRecipes()).thenReturn(recipesData);
-		
-		//When
-		//Then
-		MockMvc mock = new MockMvcBuilders().standaloneSetup(recipeController).build();
-		mock.perform(MockMvcRequestBuilders.get("/recipes/"))
-			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(MockMvcResultMatchers.view().name("recipes/recipes"))
-			.andExpect(MockMvcResultMatchers.model().attributeExists("recipes"));
-		
-		//String recipePage = recipeController.getRecipesPage(model);
-		/* Bereits über performGetTest geprüft
-		 * assertNotNull(recipePage);
-		 * assertTrue(recipePage.length() > 0);
-		*/
-		
-		//Stelle sicher das getRecipes() nur einmal aufgerufen wurde
-		/* verify(recipeService, times(1)).getRecipes(); */
-		//Stelle sicher das die addAttribute Methode nur einmal aufgerufen wird um ein Attribute für 'recipes' hinzuzufügen.
-		/* verify(model, times(1)).addAttribute(Mockito.eq("recipes"), Mockito.anySet());*/
-		/*
-		//Stelle sicher das die addAttribute Methode nur einmal aufgerufen wird um ein Attribute für 'recipes' hinzuzufügen. Speichere dafür das Argument was vom Controller hinzugefügt wird.(Set<Recipes>)
-		ArgumentCaptor<Set<Recipe>> recipesTypeCaptor = ArgumentCaptor.forClass(Set.class);
-		verify(model, times(1)).addAttribute(Mockito.eq("recipes"), recipesTypeCaptor.capture());
-		//Hole Argument mittels getValue
-		Set<Recipe> recipesAddedByController = recipesTypeCaptor.getValue();
-		//Stelle sicher das es das gleiche ist wie oben angelegt.
-		assertEquals(recipesAddedByController, recipesData);
-		*/
-	}
-	
-	@Test
-	public void newRecipesPage() throws Exception {
-		MockMvc mock = new MockMvcBuilders().standaloneSetup(recipeController).build();
-		mock.perform(MockMvcRequestBuilders.get("/recipes/new"))
-			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(MockMvcResultMatchers.view().name("recipes/recipeform"))
-			.andExpect(MockMvcResultMatchers.model().attributeExists("recipe"));
-	}
-
-	@Test
-	public void editRecipesPage() throws Exception {
+	public void editTest() throws Exception {
 		//Given
 		RecipeCommand recipe = new RecipeCommand();
 		recipe.setId(1L);
@@ -140,14 +86,42 @@ public class RecipeControllerTest {
 			.andExpect(MockMvcResultMatchers.status().isOk())
 			.andExpect(MockMvcResultMatchers.view().name("recipes/recipeform"))
 			.andExpect(MockMvcResultMatchers.model().attributeExists("recipe"));}
-
+	
+	//Update
 	@Test
-	public void getDeleteRecipesPage() throws Exception {
+	public void updateTest() throws Exception {
+		RecipeCommand testCommand = new RecipeCommand();
+		testCommand.setId(1L);
+		testCommand.setDescription("Tiramisu");
+		testCommand.setDirections("Test Direction");
+		
+		RecipeCommand storedCommand = new RecipeCommand();
+		storedCommand.setId(1L);
+		storedCommand.setDescription("New Description");
+		storedCommand.setDirections("New Direction");
+		
+		when(recipeService.getRecipe(testCommand.getId())).thenReturn(testCommand);
+		when(recipeService.saveRecipe(Mockito.any())).thenReturn(storedCommand);
+		
+		MockMvcBuilders.standaloneSetup(recipeController).build()
+				.perform(MockMvcRequestBuilders.post("/recipes/1")
+					.param("description", storedCommand.getDescription())
+					.param("directions", storedCommand.getDirections())
+				)
+				.andExpect(MockMvcResultMatchers.status().is3xxRedirection())
+				.andExpect(MockMvcResultMatchers.redirectedUrl("/recipes/"+storedCommand.getId()));
+		
+		verify(recipeService, times(1)).saveRecipe(Mockito.any());
+	}
+	
+	//Delete
+	@Test
+	public void deleteTest() throws Exception {
 		//Given
 		Long recipeId = 1L;
 		
 		//When/Then		
-		RequestBuilder request = false ? MockMvcRequestBuilders.delete("/recipes/"+recipeId+"/delete") : MockMvcRequestBuilders.get("/recipes/"+recipeId+"/delete");
+		RequestBuilder request = MockMvcRequestBuilders.get("/recipes/"+recipeId+"/delete");
 		
 		MockMvc mock = MockMvcBuilders.standaloneSetup(recipeController).build();
 			    mock.perform(request)
@@ -157,95 +131,33 @@ public class RecipeControllerTest {
 		verify(recipeService, times(1)).deleteRecipeById(recipeId);
 	}
 	
-
+	
+	//UNHAPPY PATH
+	
 	@Test
-	public void saveRecipesPage() throws Exception {
-		RecipeCommand testCommand = new RecipeCommand();
-		testCommand.setDescription("Tiramisu");
-		
-		RecipeCommand storedCommand = new RecipeCommand();
-		storedCommand.setId(1L);
-		storedCommand.setDescription(testCommand.getDescription());
-		
-		when(recipeService.saveRecipe(Mockito.any())).thenReturn(storedCommand);
-		when(recipeService.getRecipe(storedCommand.getId())).thenReturn(storedCommand);
-		
-		MockMvcBuilders.standaloneSetup(recipeController).build()
-				.perform(MockMvcRequestBuilders.post("/recipes", testCommand))
-				.andExpect(MockMvcResultMatchers.status().is3xxRedirection())
-				.andExpect(MockMvcResultMatchers.redirectedUrl("/recipes/"+storedCommand.getId()));
-		
-		verify(recipeService, times(1)).saveRecipe(Mockito.any());
-	}
-
-	@Test
-	public void getRecipeImagePage() throws Exception {
-		
-		//Given
-		RecipeCommand recipe = new RecipeCommand();
-		recipe.setId(1L);
-		recipe.setDescription("Tiramisu");
-		
-		String content = "test image";
-
-		Byte[] testImage = new Byte[content.getBytes().length];
-		int i = 0;
-		for(byte b : content.getBytes()) {
-			testImage[i++] = b;
-		}
-		recipe.setImage(testImage);
-		
-		when(recipeService.getRecipe(Mockito.eq(recipe.getId()))).thenReturn(recipe);
-		
-		//When
-		MockMvcBuilders.standaloneSetup(recipeController).build()
-			.perform(MockMvcRequestBuilders.get("/recipes/1/image"))
-			.andExpect(MockMvcResultMatchers.view().name("recipes/imageform"))
-			.andExpect(MockMvcResultMatchers.model().attributeExists("recipe"));
-		
-		
-	}
-
-	@Test
-	public void saveRecipeImage() throws Exception {
-		//Given
-		Long recipeID = 1L;
-		MockMultipartFile file = new MockMultipartFile("imagefile", "Test".getBytes());
-		
-		
-		//When
-		MockMvcBuilders.standaloneSetup(recipeController).build()
-			.perform(MockMvcRequestBuilders.multipart(String.format("/recipes/%s/image", recipeID)).file(file))
-			.andExpect(MockMvcResultMatchers.redirectedUrl(String.format("/recipes/%s", recipeID)));
-		
-		//Then
-		verify(recipeService, times(1)).addRecipeImage(Mockito.eq(recipeID), Mockito.eq(file));
-		verify(recipeService, times(1)).addRecipeImage(Mockito.eq(recipeID), Mockito.eq(file));
-	}
-
-		
-	@Test
-	public void getRecipeByIDNotFoundTest() throws Exception {
+	public void showByIDBadRequestTest() throws Exception {
 		//Given
 		when(recipeService.getRecipe(Mockito.anyLong())).thenThrow(NotFoundException.class);
 		
 		//When
-		MockMvcBuilders.standaloneSetup(recipeController).build()
+		MockMvcBuilders.standaloneSetup(recipeController).setControllerAdvice(new ControllerExceptionHandler()).build()
+		.perform(MockMvcRequestBuilders.get("/recipes/ASD"))
+		.andExpect(status().isBadRequest())
+		.andExpect(view().name("400error"));
+	}
+	
+	@Test
+	public void showByIDNotFoundTest() throws Exception {
+		//Given
+		when(recipeService.getRecipe(Mockito.anyLong())).thenThrow(NotFoundException.class);
+		
+		//When
+		MockMvcBuilders.standaloneSetup(recipeController).setControllerAdvice(new ControllerExceptionHandler()).build()
 			.perform(MockMvcRequestBuilders.get("/recipes/1"))
 			.andExpect(status().isNotFound())
 			.andExpect(view().name("404error"));
 		
 	}
-	@Test
-	public void getRecipeByIDBadRequestTest() throws Exception {
-		//Given
-		when(recipeService.getRecipe(Mockito.anyLong())).thenThrow(NotFoundException.class);
-		
-		//When
-		MockMvcBuilders.standaloneSetup(recipeController).build()
-		.perform(MockMvcRequestBuilders.get("/recipes/ASD"))
-		.andExpect(status().isBadRequest())
-		.andExpect(view().name("400error"));
-		
-	}
+	
+
 }

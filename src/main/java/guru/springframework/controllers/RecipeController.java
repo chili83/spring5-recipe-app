@@ -1,115 +1,81 @@
 package guru.springframework.controllers;
 
-import java.io.IOException;
+import javax.validation.Valid;
 
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.RequestMethod;
 
 import guru.springframework.commands.RecipeCommand;
-import guru.springframework.exceptions.NotFoundException;
 import guru.springframework.service.RecipeService;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 @Controller
-@RequestMapping("/recipes")
+@RequestMapping(RecipeController.BASE_URI)
 public class RecipeController {
+	
+	public static final String BASE_URI = RecipesController.BASE_URI + "/{recipeId}";
 
 	private RecipeService recipeService;
-
 
 	public RecipeController(RecipeService recipeService) {
 		this.recipeService = recipeService;
 	}
-
-
-	@GetMapping("")
-	public String getRecipesPage(Model mdl){
-		mdl.addAttribute("recipes", recipeService.getRecipes());
-		return "recipes/recipes";
-	}
 	
-	@GetMapping("{id}")
-	public String getRecipePage(@PathVariable String id, Model mdl) {
+	//Read
+	@GetMapping
+	public String showById(@PathVariable String recipeId, Model mdl) {
 		
-		RecipeCommand recipe = recipeService.getRecipe(new Long(id));
+		RecipeCommand recipe = recipeService.getRecipe(new Long(recipeId));
 		mdl.addAttribute("recipe",recipe);
 		
 		return "recipes/recipe";
 	}
 	
-	@GetMapping("/new")
-	public String newRecipe(Model mdl) {
-		mdl.addAttribute("recipe", new RecipeCommand());
-		return "recipes/recipeform";
-	}
-	@GetMapping("/{id}/edit")
-	public String editRecipe(@PathVariable Long id, Model mdl) {
-		mdl.addAttribute("recipe", recipeService.getRecipe(id));
+	//Edit
+	@GetMapping("/edit")
+	public String edit(@PathVariable String recipeId, Model mdl) {
+		mdl.addAttribute("recipe", recipeService.getRecipe(Long.parseLong(recipeId)));
 		return "recipes/recipeform";
 	}
 	
-	@DeleteMapping
-	@RequestMapping("/{id}/delete")
-	public String deleteRecipe(@PathVariable Long id) {
-		recipeService.deleteRecipeById(id);
-		return "redirect:/recipes";
-	}
-	
-	@GetMapping("/{id}/image")
-	public String editRecipeImage(@PathVariable Long id, Model mdl) {
+	//Update
+	@PostMapping
+	public String update(@Valid @ModelAttribute("recipe") RecipeCommand command, BindingResult bindingResult) {
 		
-		RecipeCommand recipe = recipeService.getRecipe(id);
-		mdl.addAttribute("recipe",recipe);
-		return "recipes/imageform";
-		
-	}
-	
-	@PostMapping("/{id}/image")
-	public String saveRecipeImage(@PathVariable Long id, @RequestParam("imagefile") MultipartFile file) {
-		
-		try {
-			recipeService.addRecipeImage(id, file);
-		} catch (IOException e) {
-			e.printStackTrace();
+		if (bindingResult.hasErrors()) {
+			
+			for (ObjectError err : bindingResult.getAllErrors()) {
+				log.debug(err.toString());
+			}
+			
+			return "recipes/recipeform";
 		}
-		return "redirect:/recipes/"+id;
-	}
-	
-	
-	@PostMapping(""/*name="", method=RequestMethod.POST*/)
-	public String saveOrUpdate(@ModelAttribute RecipeCommand command) {
+		
 		RecipeCommand result = recipeService.saveRecipe(command);
 		return "redirect:/recipes/" + result.getId();
 	}
 	
-	@ResponseStatus(HttpStatus.NOT_FOUND)
-	@ExceptionHandler(NotFoundException.class)
-	public ModelAndView handleNotFound(NotFoundException e) {
-		ModelAndView mv = new ModelAndView();
-		mv.addObject("exception",e);
-		mv.setViewName("404error");
-		return mv;
-	}
-	@ResponseStatus(HttpStatus.BAD_REQUEST)
-	@ExceptionHandler(NumberFormatException.class)
-	public ModelAndView handleNotFound(Exception e) {
-		ModelAndView mv = new ModelAndView();
-		mv.addObject("exception",e);
-		mv.setViewName("400error");
-		return mv;
+	
+	//Delete
+	@GetMapping("/delete")
+	public String getDelete(@PathVariable String recipeId) {
+		return delete(recipeId);
 	}
 	
-	
+	@DeleteMapping
+	public String delete(@PathVariable String recipeId){
+		recipeService.deleteRecipeById(Long.parseLong(recipeId));
+		return "redirect:/recipes";
+	}
 	
 }

@@ -12,14 +12,15 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import guru.springframework.commands.IngredientCommand;
 import guru.springframework.commands.RecipeCommand;
-import guru.springframework.commands.UnitOfMeasureCommand;
 import guru.springframework.service.IngredientService;
 import guru.springframework.service.RecipeService;
 import guru.springframework.service.UnitOfMeasureService;
 
 @Controller
-@RequestMapping("/recipes/{recipeId}/ingredients")
+@RequestMapping(IngredientController.BASE_URI)
 public class IngredientController {
+	
+	public static final String BASE_URI = IngredientsController.BASE_URI + "/{ingredientId}";
 	
 	IngredientService ingredientService;
 	UnitOfMeasureService unitOfMeasureService;
@@ -32,50 +33,25 @@ public class IngredientController {
 		this.unitOfMeasureService = unitOfMeasureService;
 	}
 	
-	
-	@GetMapping("")
-	public String getIngredientsPage(@PathVariable String recipeId, Model model) {
-		
-		RecipeCommand recipe = recipeService.getRecipe(new Long(recipeId));
-		model.addAttribute("recipe", recipe);
-		
-		return "recipes/ingredients/ingredients";
-	}
 
-	@GetMapping("{id}")
-	public String getIngredientPage(@PathVariable Long recipeId, @PathVariable String id, Model model) {
+	@GetMapping
+	public String showByID(@PathVariable Long recipeId, @PathVariable String ingredientId, Model model) {
 		
 		RecipeCommand recipe = recipeService.getRecipe(new Long(recipeId));
 		model.addAttribute("recipe", recipe);
 
-		IngredientCommand ingredients = ingredientService.getIngredient(new Long(recipeId), new Long(id));
+		IngredientCommand ingredients = ingredientService.getIngredient(new Long(recipeId), new Long(ingredientId));
 		model.addAttribute("ingredient", ingredients);
 		
 		return "recipes/ingredients/ingredient";
 	}
 	
-	@GetMapping("/new")
-	public String newIngredientPage(@PathVariable Long recipeId, Model model) {
-		RecipeCommand rc = recipeService.getRecipe(recipeId);
-		model.addAttribute("recipe", rc);
-		IngredientCommand ic = new IngredientCommand();
-		ic.setRecipeId(recipeId);
-		model.addAttribute("ingredient", ic);
-		
-		//Add empty UnitOfMeasure
-		ic.setUom(new UnitOfMeasureCommand());
-		
-		model.addAttribute("uomList", unitOfMeasureService.getUoms());
-		
-		return "recipes/ingredients/ingredientform";
-	}
-
-	@GetMapping("/{id}/edit")
-	public String newIngredientPage(@PathVariable Long recipeId, @PathVariable String id, Model model) {
+	@GetMapping("/edit")
+	public String edit(@PathVariable Long recipeId, @PathVariable String ingredientId, Model model) {
 		RecipeCommand recipe = recipeService.getRecipe(new Long(recipeId));
 		model.addAttribute("recipe", recipe);
 
-		IngredientCommand ingredients = ingredientService.getIngredient(new Long(recipeId), new Long(id));
+		IngredientCommand ingredients = ingredientService.getIngredient(new Long(recipeId), new Long(ingredientId));
 		model.addAttribute("ingredient", ingredients);
 		
 		model.addAttribute("uomList", unitOfMeasureService.getUoms());
@@ -83,17 +59,20 @@ public class IngredientController {
 		return "recipes/ingredients/ingredientform";
 	}
 
-	@PostMapping("")
-	public String saveOrUpdate(@PathVariable Long recipeId, @ModelAttribute IngredientCommand ingredientCommand) {
+	@PostMapping
+	public String update(@PathVariable Long recipeId, @ModelAttribute IngredientCommand ingredientCommand) {
 		IngredientCommand stored = ingredientService.saveIngredient(ingredientCommand);
 		return String.format("redirect:/recipes/%d/ingredients", recipeId);
 	}
 
+	@GetMapping("/delete")
+	public String getDelete(@PathVariable Long recipeId, @PathVariable Long ingredientId) {
+		return delete(recipeId, ingredientId);
+	}
 
 	@DeleteMapping
-	@RequestMapping("/{id}/delete")
-	public String deleteIngredient(@PathVariable Long recipeId, @PathVariable Long id, Model model) {
-		ingredientService.deleteIngredient(recipeId, id);
+	public String delete(@PathVariable Long recipeId, @PathVariable Long ingredientId) {
+		ingredientService.deleteIngredient(recipeId, ingredientId);
 		return String.format("redirect:/recipes/%d/ingredients", recipeId);
 	}
 	

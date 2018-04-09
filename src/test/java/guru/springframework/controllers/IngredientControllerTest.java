@@ -1,5 +1,6 @@
 package guru.springframework.controllers;
 
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -49,25 +50,7 @@ public class IngredientControllerTest {
 	}
 	
 	@Test
-	public void viewIngredientsPage() throws Exception {
-		
-		//Given
-		RecipeCommand cmd = new RecipeCommand();
-		cmd.setId(1L);
-		when(recipeService.getRecipe(Mockito.eq(1L))).thenReturn(cmd);
-		
-		//When
-		MockMvcBuilders.standaloneSetup(ingredientController).build()
-			.perform(MockMvcRequestBuilders.get(String.format("/recipes/%d/ingredients", 1)))
-			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(MockMvcResultMatchers.view().name("recipes/ingredients/ingredients"))
-			.andExpect(MockMvcResultMatchers.model().attributeExists("recipe"));
-		
-		
-	}
-	
-	@Test
-	public void viewIngredientPage() throws Exception {
+	public void showByIDTest() throws Exception {
 		//Given
 		RecipeCommand recipe = new RecipeCommand();
 		recipe.setId(1L);
@@ -96,36 +79,7 @@ public class IngredientControllerTest {
 	}
 	
 	@Test
-	public void newIngredientPage() throws Exception {
-		//Given
-		RecipeCommand recipe = new RecipeCommand();
-		recipe.setId(1L);
-
-		Set<UnitOfMeasureCommand> uoms = new HashSet<>();
-		UnitOfMeasureCommand uom = new UnitOfMeasureCommand();
-		uom.setId(212L);
-		uom.setDescription("TestEinheit");
-		uoms.add(uom);
-		
-		when(  unitOfMeasureService.getUoms()).thenReturn(uoms);
-		when(  recipeService.getRecipe(Mockito.eq(recipe.getId()))).thenReturn(recipe);
-		
-		//When
-		MockMvcBuilders.standaloneSetup(ingredientController).build()
-			.perform(MockMvcRequestBuilders.get(String.format("/recipes/%d/ingredients/new", recipe.getId())))
-			.andExpect(MockMvcResultMatchers.status().isOk())
-			.andExpect(MockMvcResultMatchers.view().name("recipes/ingredients/ingredientform"))
-			.andExpect(MockMvcResultMatchers.model().attributeExists("recipe", "ingredient", "uomList"))
-			.andExpect(MockMvcResultMatchers.model().attribute("ingredient", Matchers.hasProperty("recipeId", Matchers.equalTo(recipe.getId()))))
-			.andExpect(MockMvcResultMatchers.model().attribute("uomList", Matchers.iterableWithSize(1)));
-		
-		//Then
-		verify(recipeService, times(1)).getRecipe(Mockito.eq(recipe.getId()));
-		
-	}
-	
-	@Test
-	public void editIngredientPage() throws Exception {
+	public void editTest() throws Exception {
 		
 		//Given
 		RecipeCommand recipe = new RecipeCommand();
@@ -159,24 +113,24 @@ public class IngredientControllerTest {
 	}
 
 	@Test
-	public void saveIngredient() throws Exception {
+	public void updateTest() throws Exception {
 		RecipeCommand testCommand = new RecipeCommand();
 		testCommand.setId(1L);
 		testCommand.setDescription("Tiramisu");
 		
-		IngredientCommand newIngredient = new IngredientCommand();
-		newIngredient.setDescription("Test Ingredient");
-		newIngredient.setRecipeId(testCommand.getId());
-
 		IngredientCommand storedIngredient = new IngredientCommand();
+		storedIngredient.setRecipeId(testCommand.getId());
 		storedIngredient.setId(101L);
-		storedIngredient.setDescription(newIngredient.getDescription());
-		storedIngredient.setRecipeId(newIngredient.getRecipeId());
-		
-		when(ingredientService.saveIngredient(Mockito.any())).thenReturn(storedIngredient);
+
+		when(recipeService.getRecipe(Mockito.anyLong())).thenReturn(testCommand);
+		when(ingredientService.getIngredient(Mockito.eq(101L))).thenReturn(storedIngredient);
 		
 		MockMvcBuilders.standaloneSetup(ingredientController).build()
-			.perform(MockMvcRequestBuilders.post(String.format("/recipes/%d/ingredients/", testCommand.getId() ), newIngredient))
+			.perform(MockMvcRequestBuilders.post(String.format("/recipes/%d/ingredients/%d", storedIngredient.getRecipeId(), storedIngredient.getId() ))
+					.param("id", ""+storedIngredient.getId())
+					.param("recipeId", ""+testCommand.getId())
+					.param("description", "Test Ingredient")
+					)
 			.andExpect(MockMvcResultMatchers.status().is3xxRedirection())
 			.andExpect(MockMvcResultMatchers.redirectedUrl(String.format("/recipes/%d/ingredients",testCommand.getId())));
 		
@@ -184,7 +138,7 @@ public class IngredientControllerTest {
 	}
 	
 	@Test
-	public void deleteIngredient() throws Exception {
+	public void deleteTest() throws Exception {
 		//Given
 		RecipeCommand testCommand = new RecipeCommand();
 		testCommand.setId(1L);
