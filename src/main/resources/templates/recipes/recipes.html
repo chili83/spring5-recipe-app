@@ -1,83 +1,92 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
-    <meta charset="UTF-8"/>
-    <title>Recipe Home</title>
+<meta charset="UTF-8" />
+<title>Recipe Home</title>
 
-    <!-- Latest compiled and minified CSS -->
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}">
+<!-- Latest compiled and minified CSS -->
+<link rel="stylesheet"
+	href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"
+	th:href="@{/webjars/bootstrap/3.3.7-1/css/bootstrap.min.css}">
 
-    <!-- Latest compiled and minified JavaScript -->
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
-     th:src="@{/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js}"></script>
+<!-- Latest compiled and minified JavaScript -->
+<script
+	src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"
+	th:src="@{/webjars/bootstrap/3.3.7-1/js/bootstrap.min.js}"></script>
 </head>
 <body>
 
-<div class="container-fluid" style="margin-top: 20px">
-    <div class="row">
-        <div class="col-md-10 col-md-offset-1">
-            <div class="panel panel-primary">
+	<div class="container-fluid" style="margin-top: 20px">
+		<div class="row">
+			<div class="col-md-10 col-md-offset-1">
+				<div class="panel panel-primary">
 
-                <div class="panel-heading">
-                    <h1 class="panel-title">My Recipes!</h1>
-                </div>
-                <div class="panel-body">
-                    <div class="table-responsive" th:if="${not #lists.isEmpty(recipes)}">
-                        <table class="table table-hover ">
-                            <thead class="thead-inverse">
-                            <tr>
-                                <th>ID</th>
-                                <th>Description</th>
-                                <th>Preparation</th>
-                                <th>Cook time</th>
-                                <th>Servings</th>
-                                <th>Source</th>
-                                <th>View</th>
-                                <th>Update</th>
-                                <th>Delete</th>
-                            </tr>
-                            </thead>
-                            <tr th:remove="all">
-                                <td th:text="${recipe.id}">123</td>
-                                <td th:text="${recipe.description}">Tasty Goodnees 1</td>
-                                <td th:text="${recipe.prepTime}">1</td>
-                                <td th:text="${recipe.cookTime}">2</td>
-                                <td th:text="${recipe.servings}">3</td>
-                                <td th:text="${recipe.source}">CookNews</td>
-                                <td><a th:href="./${recipe.id}">View</a></td>
-                                <td><a th:href="./${recipe.id}">Update</a></td>
-                                <td><a th:href="./${recipe.id}">Delete</a></td>
-                            </tr>
-                            <tr th:remove="all">
-                                <td th:text="${recipe.id}">12333</td>
-                                <td th:text="${recipe.description}">Tasty Goodnees 2</td>
-                                <td th:text="${recipe.prepTime}">1</td>
-                                <td th:text="${recipe.cookTime}">2</td>
-                                <td th:text="${recipe.servings}">3</td>
-                                <td th:text="${recipe.source}">CookNews</td>
-                                <td><a th:href="./${recipe.id}">View</a></td>
-                                <td><a th:href="./${recipe.id}">Update</a></td>
-                                <td><a th:href="./${recipe.id}">Delete</a></td>
-                            </tr>
-                            <!--/*@thymesVar id="recipe" type="guru.springframework.domain.Recipe"*/-->
-                            <tr th:each="recipe : ${recipes}">
-                                <td th:text="${recipe.id}">334</td>
-                                <td th:text="${recipe.description}">Tasty Goodnees 3</td>
-                                <td th:text="${recipe.prepTime}">1</td>
-                                <td th:text="${recipe.cookTime}">2</td>
-                                <td th:text="${recipe.servings}">3</td>
-                                <td th:text="${recipe.source}">CookNews</td>
-                                <td><a th:href="@{'/recipes/'} + ${recipe.id}">View</a></td>
-                                <td><a th:href="@{'/recipes/'} + ${recipe.id +'/edit'}">Update</a></td>
-                                <td><a th:href="@{'/recipes/'} + ${recipe.id +'/delete'}">Delete</a></td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
+					<div class="panel-heading">
+						<h1 class="panel-title">My Recipes!</h1>
+						<div class="col-md-1">
+							<a class="btn btn-default" href="#"
+								th:href="@{'/recipes/create'}"
+								role="button">New</a>
+						</div>
+					</div>
+					<div class="panel-body">
+						<div class="table-responsive"
+							th:if="${not #lists.isEmpty(recipes)}">
+							<table class="table table-hover ">
+								<thead class="thead-inverse">
+									<tr>
+										<th>ID</th>
+										<th>Description</th>
+										<th>Preparation</th>
+										<th>Cook time</th>
+										<th>Servings</th>
+										<th>Source</th>
+										<th>View</th>
+										<th>Update</th>
+										<th>Delete</th>
+									</tr>
+								</thead>
+								<tr th:remove="all">
+									<td th:text="${recipe.id}">123</td>
+									<td th:text="${recipe.description}">Tasty Goodnees 1</td>
+									<td th:text="${recipe.prepTime}">1</td>
+									<td th:text="${recipe.cookTime}">2</td>
+									<td th:text="${recipe.servings}">3</td>
+									<td th:text="${recipe.source}">CookNews</td>
+									<td><a th:href="./${recipe.id}">View</a></td>
+									<td><a th:href="./${recipe.id}">Update</a></td>
+									<td><a th:href="./${recipe.id}">Delete</a></td>
+								</tr>
+								<tr th:remove="all">
+									<td th:text="${recipe.id}">12333</td>
+									<td th:text="${recipe.description}">Tasty Goodnees 2</td>
+									<td th:text="${recipe.prepTime}">1</td>
+									<td th:text="${recipe.cookTime}">2</td>
+									<td th:text="${recipe.servings}">3</td>
+									<td th:text="${recipe.source}">CookNews</td>
+									<td><a th:href="./${recipe.id}">View</a></td>
+									<td><a th:href="./${recipe.id}">Update</a></td>
+									<td><a th:href="./${recipe.id}">Delete</a></td>
+								</tr>
+								<!--/*@thymesVar id="recipe" type="guru.springframework.domain.Recipe"*/-->
+								<tr th:each="recipe : ${recipes}">
+									<td th:text="${recipe.id}">334</td>
+									<td th:text="${recipe.description}">Tasty Goodnees 3</td>
+									<td th:text="${recipe.prepTime}">1</td>
+									<td th:text="${recipe.cookTime}">2</td>
+									<td th:text="${recipe.servings}">3</td>
+									<td th:text="${recipe.source}">CookNews</td>
+									<td><a th:href="@{'/recipes/'} + ${recipe.id}">View</a></td>
+									<td><a th:href="@{'/recipes/'} + ${recipe.id +'/edit'}">Update</a></td>
+									<td><a th:href="@{'/recipes/'} + ${recipe.id +'/delete'}">Delete</a></td>
+								</tr>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 
 </body>
 </html>

@@ -57,7 +57,7 @@
 									<h5>Prep Time:</h5>
 									<img id="profileImage"
 										th:src="*{'data:image/jpg;base64,'+ recipe.getImageBase64Encoded()}"
-										src="" width="200px"/>
+										src="" width="200px" />
 								</div>
 							</div>
 							<div class="row">
@@ -107,6 +107,11 @@
 					<div class="panel panel-primary">
 						<div class="panel-heading">
 							<h1 class="panel-title">Ingredients</h1>
+							<div class="col-md-1">
+								<a class="btn btn-default" href="#"
+									th:href="@{'/recipes/' + ${recipe.id} + '/ingredients/create'}"
+									role="button">New</a>
+							</div>
 						</div>
 						<div class="panel-body">
 							<div class="row">
